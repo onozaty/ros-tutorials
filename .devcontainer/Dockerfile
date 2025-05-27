@@ -30,24 +30,14 @@ RUN apt update && apt upgrade -y
 # Install ROS 2 (Desktop Install - Recommended)
 RUN apt install -y ros-jazzy-desktop
 
+# Initialize rosdep
+# https://docs.ros.org/en/jazzy/Installation/Alternatives/Ubuntu-Install-Binary.html#linux-install-binary-install-missing-dependencies
+RUN rosdep init
+
 # Install additional development tools
 RUN apt install -y \
-    # 基本開発ツール
-    build-essential \
-    cmake \
-    git \
-    wget \
-    vim \
-    # Python開発環境
-    python3-pip \
-    python3-dev \
-    python3-venv \
-    # ネットワークツール
-    net-tools \
-    iputils-ping \
     # GUI関連 (X11フォワーディング用)
-    x11-apps \
-    && rm -rf /var/lib/apt/lists/*
+    x11-apps
 
 # ユーザー切り替え
 USER ubuntu
@@ -55,6 +45,10 @@ USER ubuntu
 # Setup environment - ROS 2環境の設定
 RUN echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc && \
     echo "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" >> ~/.bashrc
+
+# Update rosdep
+# https://docs.ros.org/en/jazzy/Installation/Alternatives/Ubuntu-Install-Binary.html#linux-install-binary-install-missing-dependencies
+RUN rosdep update
 
 # エントリーポイント
 CMD ["/bin/bash"]
