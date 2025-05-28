@@ -8,7 +8,8 @@
       "extensions": [
         "ms-vscode.cpptools-extension-pack",
         "ms-python.python",
-        "ms-python.black-formatter"
+        "ms-python.black-formatter",
+        "ms-iot.vscode-ros"
       ],
       "settings": {
       }
