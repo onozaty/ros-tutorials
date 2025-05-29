@@ -3,14 +3,18 @@
 
 FROM ubuntu:24.04
 
+# aptが安定するように、ミラーサイトを変更
+RUN apt-get update && apt-get install -y ca-certificates
+RUN sed -i.bak -r 's@http://(jp\.)?archive\.ubuntu\.com/ubuntu/?@https://ftp.udx.icscoe.jp/Linux/ubuntu/@g' /etc/apt/sources.list.d/ubuntu.sources
+
 # System setup - Set locale
-RUN apt update && apt install -y locales && \
+RUN apt-get update && apt-get install -y locales && \
     locale-gen en_US en_US.UTF-8 && \
     update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
 ENV LANG=en_US.UTF-8
 
 # Enable required repositories
-RUN apt update && apt install -y \
+RUN apt-get update && apt-get install -y \
     software-properties-common \
     curl && \
     add-apt-repository universe
@@ -22,22 +26,25 @@ RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o 
 RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null
 
 # Install development tools
-RUN apt update && apt install -y ros-dev-tools
+RUN apt-get update && apt-get install -y ros-dev-tools
 
 # Update repository caches and upgrade system
-RUN apt update && apt upgrade -y
+RUN apt-get update && apt-get upgrade -y
 
 # Install ROS 2 (Desktop Install - Recommended)
-RUN apt install -y ros-jazzy-desktop
+RUN apt-get install -y ros-jazzy-desktop
 
 # Initialize rosdep
 # https://docs.ros.org/en/jazzy/Installation/Alternatives/Ubuntu-Install-Binary.html#linux-install-binary-install-missing-dependencies
 RUN rosdep init
 
 # Install additional development tools
-RUN apt install -y \
+RUN apt-get install -y \
     # GUI関連 (X11フォワーディング用)
     x11-apps
+
+# sudoでのパスワードなしでの実行を許可するための設定
+RUN echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 # ユーザー切り替え
 USER ubuntu
